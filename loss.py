@@ -149,16 +149,12 @@ if __name__ == '__main__':
     u = torch.randn(10, 512, 25).cuda()
     v = torch.randn(10, 512, 25).cuda()
 
-    cv2_score, cv2_flow, cv2_cosine = cv2_EMD(u, v)
-    qpth_score, qpth_flow, qpth_cosine = QP_solver(u, v, return_sim_map=True)
+    cv2_score, cv2_flow = cv2_EMD(u, v)
+    qpth_score, qpth_flow = QP_solver(u, v, return_sim_map=True)
 
-    cv_val = cv2_flow
-    qpth_val = qpth_flow
+    cv_val = cv2_score
+    qpth_val = qpth_score
 
     print('emd difference:', (cv_val - qpth_val).abs().max())
     import numpy as np
-
-    print ('cosine difference: ', (cv2_cosine - qpth_cosine).abs().max())
-    np.testing.assert_allclose(cv2_cosine.cpu().detach().numpy(), qpth_cosine.cpu().detach().numpy(), rtol=1e-3, atol=1e-4)
-
     np.testing.assert_allclose(cv_val.cpu().detach().numpy(), qpth_val.cpu().detach().numpy(), rtol=1e-3, atol=1e-4)
